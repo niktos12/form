@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { IMaskInput } from 'react-imask'
 import * as z from 'zod'
 import { useState } from 'react'
-import { redirect, useNavigate } from 'react-router'
+import { useNavigate } from 'react-router'
 const schema = z.object({
   phone: z.string()
     .min(1, 'Номер телефона обязателен')
