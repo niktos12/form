@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { IMaskInput } from "react-imask"
 import { useNavigate } from "react-router"
@@ -11,14 +12,18 @@ const schema = z.object({
   name: z.string()
     .min(2, 'Имя должно содержать минимум 2 символа')
     .max(50, 'Имя не должно превышать 50 символов'),
-  surname: z.string()
-      .min(2, 'Фамилия должна содержать минимум 2 символа')
-      .max(50, 'Фамилия не должна превышать 50 символов'),
-})
+  password: z.string()
+    .min(5, 'Пароль слишком короткий'),
+    confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+        message: "Passwords do not match",
+        path: ["confirmPassword"],
+      })
 
 type FormData = z.infer<typeof schema>
 export function Reg(){
     const navigate = useNavigate()
+    const [passwordType,setPasswordType] = useState<"password" | "text">("password")
   const { 
     register, 
     handleSubmit, 
@@ -34,7 +39,13 @@ export function Reg(){
     }
   })
   
-
+  const handleVisibilityPassword = () => {
+    if(passwordType === "password"){
+      setPasswordType("text")
+    }else{
+      setPasswordType("password")
+    }
+  }
   const onSubmit = async (data: FormData) => {
     console.log('Submit:', data)
     await new Promise(res => setTimeout(res, 500))
@@ -96,23 +107,46 @@ export function Reg(){
               </div>
             )}
           </div>
-            <div>
-            <label htmlFor='surname' className='block text-sm font-medium text-white mb-2'>
-              Фамилия
+          <div className="relative">
+            <label htmlFor='password' className='block text-sm font-medium text-white mb-2'>
+              Пароль
             </label>
             <input
-              {...register('surname')}
-              id='surname'
-              type='text'
-              placeholder='Введите вашу фамилию'
-              className='w-full rounded-xl bg-white/20 border border-white/30 px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-200'
+              {...register('password')}
+              id='password'
+              type={passwordType}
+              placeholder='Введите ваш пароль'
+              className='w-full rounded-xl  bg-white/20 border border-white/30 px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-200'
             />
-            {errors.surname && (
+            <span
+              onClick={handleVisibilityPassword}
+              className="absolute right-4 top-[44px] cursor-pointer text-sm text-white"
+            >
+              {passwordType === 'password' ? 'Показать' : 'Скрыть'} 
+            </span>
+            {errors.password && (
               <div className='text-amber-300 text-sm mt-2 flex items-center'>
                 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' className='w-4 h-4 mr-1'>
                   <path fillRule='evenodd' d='M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z' clipRule='evenodd' />
                 </svg>
-                {errors.surname.message}
+                {errors.password.message}
+              </div>
+            )}
+          </div>
+          <div>
+            <input
+              {...register('confirmPassword')}
+              id='confirmPassword'
+              type="password"
+              placeholder='Подтвердите ваш пароль'
+              className='w-full rounded-xl  bg-white/20 border border-white/30 px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-200'
+            />
+            {errors.confirmPassword && (
+              <div className='text-amber-300 text-sm mt-2 flex items-center'>
+                <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' className='w-4 h-4 mr-1'>
+                  <path fillRule='evenodd' d='M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z' clipRule='evenodd' />
+                </svg>
+                {errors.confirmPassword.message}
               </div>
             )}
           </div>
@@ -133,7 +167,7 @@ export function Reg(){
             </a>
           </div>
         </form>
-      </div>
+        </div>
       </div>
     )
 }
