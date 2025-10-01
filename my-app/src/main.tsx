@@ -4,9 +4,9 @@ import './index.css'
 import App from './App.tsx'
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
-import { Main } from './mainPage.tsx';
-import Auth from './Auth.tsx';
-import Reg from './Reg.tsx';
+import { Main } from './pages/mainPage.tsx';
+import Auth from './components/Auth.tsx';
+import Reg from './components/Reg.tsx';
 
 const router = createBrowserRouter([
   {
