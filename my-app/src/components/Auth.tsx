@@ -4,13 +4,15 @@ import { useForm } from "react-hook-form";
 import { IMaskInput } from "react-imask";
 import { useNavigate } from "react-router";
 import z from "zod";
+import { useAuth } from "../hooks/useAuth";
+import { ProtectedRoute } from "./ProtectedRoute";
 
 const schema = z.object({
   phone: z
     .string()
     .min(1, "Номер телефона обязателен")
     .min(18, "Номер телефона должен быть полным"),
-  name: z
+  username: z
     .string()
     .min(2, "Имя должно содержать минимум 2 символа")
     .max(50, "Имя не должно превышать 50 символов"),
@@ -18,39 +20,62 @@ const schema = z.object({
 });
 
 type FormData = z.infer<typeof schema>;
-export function Auth() {
+
+// Простая реализация debounce
+// function debounce<T extends (...args: any[]) => any>(
+//   func: T,
+//   wait: number
+// ): (...args: Parameters<T>) => void {
+//   let timeout: NodeJS.Timeout;
+//   return (...args: Parameters<T>) => {
+//     clearTimeout(timeout);
+//     timeout = setTimeout(() => func(...args), wait);
+//   };
+// }
+
+function AuthContent() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [passwordType, setPasswordType] = useState<"password" | "text">(
     "password"
   );
+  const [submitError, setSubmitError] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const {
     register,
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, isSubmitting, isValid },
+    formState: { errors, isValid },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     mode: "onChange",
     defaultValues: {
       phone: "",
-      name: "",
+      username: "",
     },
   });
 
   const handleVisibilityPassword = () => {
-    if (passwordType === "password") {
-      setPasswordType("text");
-    } else {
-      setPasswordType("password");
-    }
+    setPasswordType((prev) => (prev === "password" ? "text" : "password"));
   };
+
   const onSubmit = async (data: FormData) => {
-    console.log("Submit:", data);
-    await new Promise((res) => setTimeout(res, 500));
-    navigate("/main");
+    setIsSubmitting(true);
+    setSubmitError("");
+
+    const result = await login(data);
+
+    if (!result.success) {
+      setSubmitError(result.error || "Ошибка входа");
+    }
+
+    setIsSubmitting(false);
   };
+
   const phoneValue = watch("phone");
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 to-indigo-800">
       <div className="bg-white/10 backdrop-blur-lg w-full max-w-md rounded-2xl shadow-2xl p-8 border border-white/20">
@@ -98,21 +123,22 @@ export function Auth() {
               </div>
             )}
           </div>
+
           <div>
             <label
-              htmlFor="name"
+              htmlFor="username"
               className="block text-sm font-medium text-white mb-2"
             >
               Имя
             </label>
             <input
-              {...register("name")}
-              id="name"
+              {...register("username")}
+              id="username"
               type="text"
               placeholder="Введите ваше имя"
               className="w-full rounded-xl bg-white/20 border border-white/30 px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-200"
             />
-            {errors.name && (
+            {errors.username && (
               <div className="text-amber-300 text-sm mt-2 flex items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -126,10 +152,11 @@ export function Auth() {
                     clipRule="evenodd"
                   />
                 </svg>
-                {errors.name.message}
+                {errors.username.message}
               </div>
             )}
           </div>
+
           <div className="relative">
             <label
               htmlFor="password"
@@ -142,7 +169,7 @@ export function Auth() {
               id="password"
               type={passwordType}
               placeholder="Введите ваш пароль"
-              className="w-full rounded-xl  bg-white/20 border border-white/30 px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-200"
+              className="w-full rounded-xl bg-white/20 border border-white/30 px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all duration-200"
             />
             <span
               onClick={handleVisibilityPassword}
@@ -169,9 +196,14 @@ export function Auth() {
             )}
           </div>
 
+          {submitError && (
+            <div className="text-amber-300 text-sm text-center">
+              {submitError}
+            </div>
+          )}
+
           <button
             type="submit"
-            onClick={() => onSubmit}
             disabled={isSubmitting || !isValid}
             className="w-full bg-gradient-to-r from-amber-400 to-amber-500 text-gray-900 rounded-xl py-3.5 font-semibold hover:from-amber-300 hover:to-amber-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] focus:scale-[0.98]"
           >
@@ -180,7 +212,6 @@ export function Auth() {
 
           <div className="text-center">
             <span className="text-white/70 text-sm">Еще нет аккаунта? </span>
-
             <a
               onClick={() => navigate("/reg")}
               className="cursor-pointer text-amber-300 hover:text-amber-200 font-medium transition-colors duration-200"
@@ -193,4 +224,13 @@ export function Auth() {
     </div>
   );
 }
+
+export function Auth() {
+  return (
+    <ProtectedRoute requireAuth={false}>
+      <AuthContent />
+    </ProtectedRoute>
+  );
+}
+
 export default Auth;
