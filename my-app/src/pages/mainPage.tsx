@@ -9,7 +9,7 @@ import { Pagination } from "swiper/modules";
 import { Adventages } from "../components/Adventages";
 import { Projects } from "../components/Projects";
 function MainContent() {
-  const { user, logout, authFetch } = useAuth();
+  const { authFetch } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
 
   const data = [

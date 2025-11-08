@@ -1,12 +1,12 @@
-interface User {
-  id: number;
-  username: string;
-  phone: string;
-}
-interface HeaderProps {
-  user?: User | null;
-  onLogout: () => void;
-}
+// interface User {
+//   id: number;
+//   username: string;
+//   phone: string;
+// }
+// interface HeaderProps {
+//   user?: User | null;
+//   onLogout: () => void;
+// }
 //{ user, onLogout }: HeaderProps
 export function Header() {
   return (
