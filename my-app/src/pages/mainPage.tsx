@@ -12,17 +12,17 @@ function MainContent() {
   const { authFetch } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
 
-  const data = [
-    { id: 1, text: "Описание товара 1", title: "Product 1" },
-    { id: 2, text: "Описание товара 2", title: "Product 2" },
-    { id: 3, text: "Описание товара 3", title: "Product 3" },
-    { id: 4, text: "Описание товара 4", title: "Product 4" },
-    { id: 5, text: "Описание товара 5", title: "Product 5" },
-    { id: 6, text: "Описание товара 6", title: "Product 6" },
-    { id: 7, text: "Описание товара 7", title: "Product 7" },
-    { id: 8, text: "Описание товара 8", title: "Product 8" },
-    { id: 9, text: "Описание товара 9", title: "Product 9" },
-  ];
+  // const data = [
+  //   { id: 1, text: "Описание товара 1", title: "Product 1" },
+  //   { id: 2, text: "Описание товара 2", title: "Product 2" },
+  //   { id: 3, text: "Описание товара 3", title: "Product 3" },
+  //   { id: 4, text: "Описание товара 4", title: "Product 4" },
+  //   { id: 5, text: "Описание товара 5", title: "Product 5" },
+  //   { id: 6, text: "Описание товара 6", title: "Product 6" },
+  //   { id: 7, text: "Описание товара 7", title: "Product 7" },
+  //   { id: 8, text: "Описание товара 8", title: "Product 8" },
+  //   { id: 9, text: "Описание товара 9", title: "Product 9" },
+  // ];
 
   const fetchUsers = async () => {
     try {

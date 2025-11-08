@@ -8,7 +8,7 @@ import { ProtectedRoute } from "../components/ProtectedRoute";
 export function ProjectPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { projects, fetchProjects, user } = useAuth();
+  const { projects, fetchProjects } = useAuth();
   const [project, setProject] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [relatedProjects, setRelatedProjects] = useState<any[]>([]);
