@@ -7,6 +7,8 @@ import App from "./App.tsx";
 import { Main } from "./pages/mainPage.tsx";
 import Auth from "./components/Auth.tsx";
 import Reg from "./components/Reg.tsx";
+import ProjectPage from "./pages/projectPage.tsx";
+import CleaningSystemPage from "./pages/smth.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -21,8 +23,16 @@ const router = createBrowserRouter([
     element: <Reg />,
   },
   {
+    path: "/project/:id",
+    element: <ProjectPage />,
+  },
+  {
     path: "/main",
     element: <Main />,
+  },
+  {
+    path: "/smth",
+    element: <CleaningSystemPage />,
   },
 ]);
 

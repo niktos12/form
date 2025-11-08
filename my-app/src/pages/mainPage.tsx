@@ -3,7 +3,11 @@ import { Footer } from "../components/Footer";
 import { Header } from "../components/Header";
 import { ProtectedRoute } from "../components/ProtectedRoute";
 import { useAuth, type User } from "../hooks/useAuth";
-
+import { NavHeader } from "../components/NavHeader";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination } from "swiper/modules";
+import { Adventages } from "../components/Adventages";
+import { Projects } from "../components/Projects";
 function MainContent() {
   const { user, logout, authFetch } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
@@ -37,10 +41,70 @@ function MainContent() {
   }, []);
 
   return (
-    <div className="bg-gradient-to-br from-purple-900 to-indigo-800 min-h-screen">
-      <Header onLogout={logout} user={user} />
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 p-8 gap-6">
+    <div
+      className="bg-gradient-to-r
+        from-[#00011A] to-[#0F0F0F] min-h-screen"
+    >
+      {/* <Header onLogout={logout} user={user} /> */}
+      <NavHeader />
+      <Header />
+      <Swiper
+        className=" container  my-20 w-full"
+        modules={[Pagination]}
+        slidesPerView={1}
+        pagination={{ el: ".pagination", clickable: true }}
+      >
+        <SwiperSlide className="!flex flex-row justify-between w-full">
+          <div className="flex flex-col gap-7 items-start max-w-[580px]">
+            <h1 className="text-white font-bold text-6xl">
+              Автономная канализация для частного дома
+            </h1>
+            <p className="mb-2 text-white text-xl">
+              Производим автономные канализации, очистные сооружения,
+              накопительные ёмкости и различные комплектующие к ним.
+            </p>
+            <button className="rounded-sm bg-[#1078D7] text-white text-sm px-10 py-4 ">
+              Перейти в каталог
+            </button>
+          </div>
+          <img src="/cleaner.svg" />
+        </SwiperSlide>
+        <SwiperSlide className="!flex flex-row justify-between">
+          <div className="flex flex-col gap-7 items-start max-w-[580px]">
+            <h1 className="text-white font-bold text-6xl">
+              Автономная канализация для частного дома
+            </h1>
+            <p className="mb-2 text-white text-xl">
+              Производим автономные канализации, очистные сооружения,
+              накопительные ёмкости и различные комплектующие к ним.
+            </p>
+            <button className="rounded-sm bg-[#1078D7] text-white text-sm px-10 py-4 ">
+              Перейти в каталог
+            </button>
+          </div>
+          <img src="/cleaner.svg" />
+        </SwiperSlide>
+        <SwiperSlide className="!flex flex-row justify-between">
+          <div className="flex flex-col gap-7 items-start max-w-[580px]">
+            <h1 className="text-white font-bold text-6xl">
+              Автономная канализация для частного дома
+            </h1>
+            <p className="mb-2 text-white text-xl">
+              Производим автономные канализации, очистные сооружения,
+              накопительные ёмкости и различные комплектующие к ним.
+            </p>
+            <button className="rounded-sm bg-[#1078D7] text-white text-sm px-10 py-4 ">
+              Перейти в каталог
+            </button>
+          </div>
+          <img src="/cleaner.svg" />
+        </SwiperSlide>
+        <div className="pagination"></div>
+      </Swiper>
+      <Adventages />
+      <Projects />
+      {/* product mb not required
+       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 p-8 gap-6">
         {data.map((card) => (
           <div
             key={card.id}
@@ -58,7 +122,7 @@ function MainContent() {
             </button>
           </div>
         ))}
-      </div>
+      </div> */}
 
       <div className="p-8">
         <h2 className="text-white text-2xl font-bold mb-4">

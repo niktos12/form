@@ -7,14 +7,22 @@ interface HeaderProps {
   user?: User | null;
   onLogout: () => void;
 }
-
-export function Header({ user, onLogout }: HeaderProps) {
+//{ user, onLogout }: HeaderProps
+export function Header() {
   return (
-    <header className="bg-white/10 backdrop-blur-lg border-b border-white/20">
+    <header className="backdrop-blur-lg border-b border-white/20 bg-gradient-to-r
+        from-[#00011A] to-[#0F0F0F]">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <div className="text-white text-2xl font-bold">MyStore</div>
+        {/* <div className="text-white text-2xl font-bold">MyStore</div> */}
+        <img src="/logo.svg" />
 
-        <div className="flex items-center gap-4">
+        <div className="flex flex-row gap-14">
+          <a href="#" className="text-white">О компании</a>
+          <a href="#" className="text-white">Проекты</a>
+          <a href="#" className="text-white">Каталог</a>
+          <a href="#" className="text-white">Контакты</a>
+        </div>
+        {/* <div className="flex items-center gap-4">
           {user && (
             <>
               <span className="text-white">Привет, {user.username}!</span>
@@ -26,7 +34,10 @@ export function Header({ user, onLogout }: HeaderProps) {
               </button>
             </>
           )}
-        </div>
+        </div> */}
+        <button className="rounded-sm bg-[#1078D7] text-white text-sm px-5 py-2 ">
+          Получить КП
+        </button>
       </div>
     </header>
   );

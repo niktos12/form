@@ -7,10 +7,10 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://jwt-back-ivory.vercel.app",
+        target: "http://localhost:3000",
         changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api/, "/api"),
+        // secure: false,
+        // rewrite: (path) => path.replace(/^\/api/, "/api"),
       },
     },
   },

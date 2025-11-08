@@ -6,28 +6,50 @@ export interface User {
   username: string;
   phone: string;
 }
+export interface Project {
+  id: number;
+  photo: string;
+  title: string;
+  description: string;
+  workType: string;
+  client: string;
+}
 
+export interface Advantage {
+  title: string;
+  description: string;
+}
+
+// export interface Contact {
+//   phones: string[];
+//   address: string;
+//   email: string;
+//   title: string;
+// }
 interface AuthResponse {
   accessToken: string;
   refreshToken: string;
   user: User;
 }
 
+const API_BASE_URL = "";
+
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [advantages, setAdvantages] = useState<Advantage[]>([]);
+  // const [contacts, setContacts] = useState<Contact | null>(null);
+
   const navigate = useNavigate();
 
-  // Добавляем рефы для отслеживания состояния запросов
   const usersFetchRef = useRef(false);
   const authCheckRef = useRef(false);
 
-  // Проверяем наличие токенов при инициализации - ТОЛЬКО ОДИН РАЗ
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
 
-    // Защита от повторных вызовов
     if (authCheckRef.current) return;
     authCheckRef.current = true;
 
@@ -36,19 +58,72 @@ export const useAuth = () => {
     } else {
       setLoading(false);
     }
-
-    // Загружаем пользователей только если нужно (для регистрации)
-    // Убираем автоматическую загрузку пользователей
   }, []);
+  const fetchProjects = async () => {
+    try {
+      const response = await authFetch("/api/projects");
+      if (response?.ok) {
+        const projectsData = await response.json();
+        setProjects(projectsData);
+      }
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+    }
+  };
+  const addProject = async (projectData: Omit<Project, "id">) => {
+    try {
+      const response = await authFetch("/api/projects", {
+        method: "POST",
+        body: JSON.stringify(projectData),
+      });
 
-  // Функция для получения всех пользователей - ТОЛЬКО ПО ТРЕБОВАНИЮ
+      if (response?.ok) {
+        await fetchProjects();
+        return { success: true };
+      } else {
+        return { success: false, error: "Ошибка при добавлении проекта" };
+      }
+    } catch (error) {
+      return { success: false, error: "Ошибка сети" };
+    }
+  };
+  const getProjectById = (id: number): Project | undefined => {
+  return projects.find(project => project.id === id);
+};
+  const fetchAdvantages = async () => {
+    try {
+      const response = await authFetch("/api/advantages");
+      if (response?.ok) {
+        const advantagesData = await response.json();
+        setAdvantages(advantagesData);
+      }
+    } catch (error) {
+      console.error("Error fetching advantages:", error);
+    }
+  };
+  const addAdvantage = async (advantageData: Advantage) => {
+    try {
+      const response = await authFetch("/api/advantages", {
+        method: "POST",
+        body: JSON.stringify(advantageData),
+      });
+
+      if (response?.ok) {
+        await fetchAdvantages();
+        return { success: true };
+      } else {
+        return { success: false, error: "Ошибка при добавлении преимущества" };
+      }
+    } catch (error) {
+      return { success: false, error: "Ошибка сети" };
+    }
+  };
   const fetchAllUsers = async (force = false) => {
-    // Защита от повторных одновременных запросов
     if (usersFetchRef.current && !force) return;
     usersFetchRef.current = true;
 
     try {
-      const response = await fetch("/api/users");
+      const response = await fetch(`${API_BASE_URL}/api/users`);
       if (response.ok) {
         const usersData = await response.json();
         setAllUsers(usersData);
@@ -60,7 +135,6 @@ export const useAuth = () => {
     }
   };
 
-  // Проверяем валидность токена
   const checkAuth = async () => {
     const token = localStorage.getItem("accessToken");
     if (!token) {
@@ -69,7 +143,7 @@ export const useAuth = () => {
     }
 
     try {
-      const response = await fetch("/api/protected", {
+      const response = await fetch(`${API_BASE_URL}/api/protected`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -81,7 +155,6 @@ export const useAuth = () => {
         setLoading(false);
         return true;
       } else {
-        // Если токен невалиден, пробуем обновить
         const refreshed = await refreshToken();
         setLoading(false);
         return refreshed;
@@ -93,22 +166,14 @@ export const useAuth = () => {
     }
   };
 
-  // Проверяем наличие валидного токена (быстрая проверка без запроса к серверу)
   const hasValidToken = (): boolean => {
     const token = localStorage.getItem("accessToken");
     if (!token) return false;
 
-    // Базовая проверка формата JWT токена
     try {
       const payload = JSON.parse(atob(token.split(".")[1]));
       const currentTime = Date.now() / 1000;
-
-      // Проверяем expiration time
-      if (payload.exp && payload.exp < currentTime) {
-        return false;
-      }
-
-      return true;
+      return !(payload.exp && payload.exp < currentTime);
     } catch {
       return false;
     }
@@ -122,7 +187,7 @@ export const useAuth = () => {
     }
 
     try {
-      const response = await fetch("/api/refresh", {
+      const response = await fetch(`${API_BASE_URL}/api/refresh`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -147,7 +212,6 @@ export const useAuth = () => {
     }
   };
 
-  // Функция проверки существования пользователя
   const checkUserExists = (
     username: string,
     phone: string
@@ -184,7 +248,7 @@ export const useAuth = () => {
     phone: string;
   }) => {
     try {
-      const response = await fetch("/api/login", {
+      const response = await fetch(`${API_BASE_URL}/api/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -220,12 +284,10 @@ export const useAuth = () => {
     password: string;
     phone: string;
   }) => {
-    // Сначала загружаем пользователей, если еще не загружены
     if (allUsers.length === 0) {
       await fetchAllUsers();
     }
 
-    // Проверяем существование пользователя перед регистрацией
     const userCheck = checkUserExists(userData.username, userData.phone);
     if (userCheck.exists) {
       return {
@@ -236,7 +298,7 @@ export const useAuth = () => {
     }
 
     try {
-      const response = await fetch("/api/register", {
+      const response = await fetch(`${API_BASE_URL}/api/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -250,7 +312,6 @@ export const useAuth = () => {
         localStorage.setItem("refreshToken", data.refreshToken);
         setUser(data.user);
 
-        // Обновляем список пользователей после успешной регистрации
         await fetchAllUsers(true);
 
         navigate("/main");
@@ -275,7 +336,7 @@ export const useAuth = () => {
 
     if (refreshToken) {
       try {
-        await fetch("/api/logout", {
+        await fetch(`${API_BASE_URL}/api/logout`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -290,7 +351,6 @@ export const useAuth = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     setUser(null);
-    // Сбрасываем флаги при выходе
     authCheckRef.current = false;
     usersFetchRef.current = false;
     navigate("/auth");
@@ -305,7 +365,10 @@ export const useAuth = () => {
     };
 
     try {
-      const response = await fetch(url, { ...options, headers });
+      const response = await fetch(`${API_BASE_URL}${url}`, {
+        ...options,
+        headers,
+      });
 
       if (response.status === 401) {
         await refreshToken();
@@ -315,7 +378,10 @@ export const useAuth = () => {
             ...headers,
             Authorization: `Bearer ${newToken}`,
           };
-          return fetch(url, { ...options, headers: newHeaders });
+          return fetch(`${API_BASE_URL}${url}`, {
+            ...options,
+            headers: newHeaders,
+          });
         }
       }
 
@@ -329,12 +395,19 @@ export const useAuth = () => {
     user,
     loading,
     allUsers,
+    advantages,
+    projects,
     login,
     register,
     logout,
     authFetch,
-    fetchAllUsers, // Экспортируем для явного вызова
+    fetchAllUsers,
     checkUserExists,
+    getProjectById,
+    fetchAdvantages,
+    addAdvantage,
+    fetchProjects,
+    addProject,
     hasValidToken,
     isAuthenticated: !!user,
   };
